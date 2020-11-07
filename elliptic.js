@@ -1,3 +1,5 @@
+const BN = require('bn.js');
+
 var EC = require('elliptic').ec;
  
 // Create and initialize EC context
@@ -5,7 +7,9 @@ var EC = require('elliptic').ec;
 var ec = new EC('secp256k1');
  
 // Generate keys
-var key = ec.keyFromPrivate([2]);
+const privateKey = new BN('a69591c3ac67de5ed31fb4934dfd3890578a31afabbc10587fca620d9175ec46', 'hex');
+
+var key = ec.keyFromPrivate(privateKey.toBuffer());
 console.log(key.getPublic().getX().toString('hex'));
 console.log(key.getPublic().getY().toString('hex'));
  
