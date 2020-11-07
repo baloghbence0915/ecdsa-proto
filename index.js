@@ -156,18 +156,29 @@ const {
 } = curves[0];
 
 const privateKey = new BN('a69591c3ac67de5ed31fb4934dfd3890578a31afabbc10587fca620d9175ec46', 'hex');
-const publicKey = mul(a, G, privateKey, p, true);
+const publicKey = mul(a, G, privateKey, p);
 const m = hash({ secret: 'xxx' });
 
-let k = new BN(crypto.randomBytes(32));
-while (k.gte(n)) {
-    k = new BN(crypto.randomBytes(32));
-}
+let k = new BN(1234567890);
+// let k = new BN(crypto.randomBytes(32));
+// while (k.gte(n)) {
+//     k = new BN(crypto.randomBytes(32));
+// }
 
 const R = mul(a,G,k,p);
 const r = R.x;
 
-m.add(privateKey).mul(r)
+// const s = m.add(privateKey.mul(r)).mul(k.invm(n)).mod(p)
+const s = k.invm(n).mul(m.add(privateKey.mul(r))).mod(n);
+
+const w = s.invm(n);
+
+const [u1, u2] = [
+    w.mul(m).mod(n),
+    w.mul(r).mod(n)
+];
+
+const PP = add(a, mul(a, G, u1, p), mul(a, publicKey, u2, p), p);
 
 console.log(
     {
@@ -175,9 +186,17 @@ console.log(
         publicKey: printable(publicKey),
         m: m.toString('hex'),
         k: k.toString('hex'),
-        R: printable(R)
+        R: printable(R),
+        s: s.toString('hex'),
+        PP: printable(PP),
+        xPmodp: PP.x.mod(p).toString('hex'),
+        rmodp: r.mod(p).toString('hex'),
+        valid: PP.x.mod(p).toString('hex') === r.mod(p).toString('hex')
     }
 );
 
+
+
 // Exports:
 exports.doubling = doubling;
+exports.hash = hash;

@@ -1,3 +1,4 @@
+const { hash } = require('./index');
 const BN = require('bn.js');
 
 var EC = require('elliptic').ec;
@@ -14,8 +15,9 @@ console.log(key.getPublic().getX().toString('hex'));
 console.log(key.getPublic().getY().toString('hex'));
  
 // Sign the message's hash (input must be an array, or a hex-string)
-// var msgHash = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
-// var signature = key.sign(msgHash);
+var msgHash = hash({ secret: 'xxx' })
+var signature = key.sign(msgHash, { k: () => new BN(1234567890) });
+console.log(signature.r.toString('hex'), signature.s.toString('hex'));
  
 // Export DER encoded signature in Array
 // var derSign = signature.toDER();
